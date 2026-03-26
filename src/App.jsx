@@ -4,6 +4,7 @@ import useEmblaCarousel from 'embla-carousel-react'
 import Autoplay from 'embla-carousel-autoplay';
 import { NextButton } from './CarouselButtons';
 import Modal from 'react-modal';
+import { ToastContainer,toast } from 'react-toastify';
 
 
 function MiniDisplay() {
@@ -124,6 +125,18 @@ function MiniItemDisplay() {
   ) 
 }
 
+  const notify = () => toast.info("User1241 Place a Bid!", {
+    position: "bottom-left",
+autoClose: 5000,
+hideProgressBar: false,
+closeOnClick: false,
+pauseOnHover: true,
+draggable: true,
+progress: undefined,
+theme: "dark",
+  });
+
+
 function ItemDisplay(image) {
   return (
     <div class = "flex p-5 ml-10">
@@ -175,6 +188,7 @@ Vivamus sed augue blandit augue sagittis molestie. Aliquam rhoncus nisl quam, ve
           </div>
           <div>
             <button class = " bg-blue-700 hover:bg-lime-400 text-white font-bold py-2 px-4 rounded-full min-w-100 max-w-100 mt-5">Place Bid</button>
+            
           </div>
           
         </div>
@@ -263,7 +277,8 @@ function App() {
           <div class = "flex items-center justify-end mr-20">
             <ul>
               <div class = "flex justify-between space-x-10 text-white">
-                <li><button class="border min-w-20 max-w-20 min-h-10 max-h-10 rounded-full bg-blue-700 text-white hover:scale-110">Create</button></li>
+                <li><button onClick={notify} class="border min-w-20 max-w-20 min-h-10 max-h-10 rounded-full bg-blue-700 text-white hover:scale-110">Create</button>
+                </li>
                 <li><button class=" min-w-20 max-w-20 min-h-10 max-h-10 hover:scale-110 hover:rounded-full hover:border hover:bg-white hover:text-black ">Account</button></li>
                 <li><button class=" min-w-20 max-w-20 min-h-10 max-h-10 hover:scale-110 hover:rounded-full hover:border hover:bg-white hover:text-black">Help</button></li>
                 <li><button class=" min-w-20 max-w-20 min-h-10 max-h-10 hover:scale-110 hover:rounded-full hover:border hover:bg-white hover:text-black">About</button></li>
@@ -282,6 +297,18 @@ function App() {
         
       </header>
       </div>
+      <ToastContainer 
+                position="bottom-left"
+                autoClose={5000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick={false}
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+                theme="dark"
+                ></ToastContainer>
 
       <div class = "flex justify-center">
         <div class="grid-cols-1 grid-rows-2">
