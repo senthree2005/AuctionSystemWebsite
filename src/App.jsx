@@ -103,7 +103,7 @@ function MiniItemDisplay() {
   return(
     <div>
       <div class="mb-5">
-          <input type="text" class=" border border-indigo-600 focus:outline-hidden rounded-full min-w-full max-w-full min-h-10 max-h-10 px-4 py-2"placeholder='Search'></input>
+          <input type="text" class=" border border-indigo-600 focus:border-white focus:outline-hidden rounded-full min-w-full max-w-full min-h-10 max-h-10 px-4 py-2"placeholder='Search'></input>
       </div>
       <div class = "grid grid-cols-2 gap-x-25 gap-y-10">
         <MiniDisplay />
@@ -116,6 +116,7 @@ function MiniItemDisplay() {
       <MiniDisplay />
 
       <MiniDisplay />
+      
       </div>
       
 
@@ -206,7 +207,7 @@ function PopupDisplay() {
     <div tabIndex="0" class="flex min-h-full items-end justify-center p-4 text-center focus:outline-none sm:items-center sm:p-0">
       <el-dialog-panel class="relative z-50 flex justify-between min-w-250 max-w-250 min-h-110 max-h-110 bg-slate-900 border-2 border-gray-300 rounded-xl shadow-md p-6 mt-10 mb-10 text-white">
         <div class="absolute">
-          <button command="close" commandfor="dialog"  class="size-10 border rounded-full font-sans border-indigo-400 text-cyan-400">X</button>
+          <button command="close" commandfor="dialog"  class="size-10 border rounded-full font-sans border-indigo-400 text-cyan-400 hover:scale-120 hover:bg-white">X</button>
         </div>
         
         <div>
@@ -224,7 +225,7 @@ function PopupDisplay() {
 
 function PromoDisplay() {
   return (
-    <div class= "flex justify-between min-w-250 max-w-250 min-h-110 max-h-110 bg-slate-900/80 border-2 border-gray-300 rounded-xl shadow-md p-6 mt-10 mb-10 text-white">
+    <div class= "flex justify-between min-w-250 max-w-250 min-h-110 max-h-110 backdrop-blur-xs bg-slate-900/80 border-2 border-gray-300 rounded-xl shadow-md p-6 mt-10 mb-10 text-white">
         {/* {ItemDisplay()} */}
 
         {/* {ItemDisplay(<img src='/src/assets/img1.jpg'></img>)} */}
@@ -238,7 +239,7 @@ function MainDisplay() {
   
   return(
   
-  <div class= "flex justify-center w-250 h-fit bg-slate-900/80 border-2 border-gray-300 rounded-xl shadow-md p-6 mt-10 mb-10 text-white">
+  <div class= "flex justify-center w-250 h-fit bg-slate-900/80 border-2 border-gray-300 backdrop-blur-xs rounded-xl shadow-md p-6 mt-10 mb-10 text-white">
     <MiniItemDisplay />
 
   </div>
@@ -251,28 +252,33 @@ function App() {
 
   return (
     <div class = "font-bold font-display">
-      <div class = "bg-slate-900 h-25 sticky">
-        <header>
-        <div class = "grid grid-cols-2">
-          <div class = "flex items-center justify-center m-6 text-5xl text-yellow-400">
+      <div class = "bg-gray-950/60 h-25 sticky backdrop-blur-xs border-b-1 rounded-full border-white">
+        <header >
+          <nav class="sticky top-0 z-10 ">
+            <div class = "grid grid-cols-2 min-w-full max-w-full">
+          <div class = "flex items-center justify-center m-5 text-5xl text-blue-400 italic font-semibold">
             <h1>Auction System</h1>
           </div>
           
           <div class = "flex items-center justify-end mr-20">
             <ul>
-              <div class = "flex justify-between space-x-15 text-orange-500">
-                <li><h3>HOME</h3></li>
-                <li><h3>CREATE</h3></li>
-                <li><h3>ABOUT</h3></li>
-                <li><h3>HELP</h3></li>
-                <li><h3>SETTINGS</h3></li>
-                <li><h3>ACCOUNT</h3></li>
+              <div class = "flex justify-between space-x-10 text-white">
+                <li><button class="border min-w-20 max-w-20 min-h-10 max-h-10 rounded-full bg-blue-700 text-white hover:scale-110">Create</button></li>
+                <li><button class=" min-w-20 max-w-20 min-h-10 max-h-10 hover:scale-110 hover:rounded-full hover:border hover:bg-white hover:text-black ">Account</button></li>
+                <li><button class=" min-w-20 max-w-20 min-h-10 max-h-10 hover:scale-110 hover:rounded-full hover:border hover:bg-white hover:text-black">Help</button></li>
+                <li><button class=" min-w-20 max-w-20 min-h-10 max-h-10 hover:scale-110 hover:rounded-full hover:border hover:bg-white hover:text-black">About</button></li>
+                
+                
+                
+                
               </div>
               
             </ul>
 
           </div>
         </div>
+          </nav>
+        
         
       </header>
       </div>
