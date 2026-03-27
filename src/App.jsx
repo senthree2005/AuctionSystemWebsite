@@ -5,6 +5,7 @@ import Autoplay from 'embla-carousel-autoplay';
 import { NextButton } from './CarouselButtons';
 import Modal from 'react-modal';
 import { ToastContainer,toast } from 'react-toastify';
+import { AiFillBell, AiOutlineUser } from "react-icons/ai";
 
 
 function MiniDisplay() {
@@ -42,7 +43,7 @@ function MiniDisplay() {
               </div>
 
               <div>
-                <button command="show-modal" commandfor="dialog" class = " bg-blue-700 hover:bg-orange-400 text-white font-semibold text-xs rounded-full h-5 w-45 mt-4">Click for more information.</button>
+                <button command="show-modal" commandfor="info" class = " bg-blue-700 hover:bg-white hover:text-black text-white font-semibold text-xs rounded-full h-5 w-45 mt-4">Click for more information.</button>
                 
               </div>
             </div>
@@ -132,6 +133,7 @@ hideProgressBar: false,
 closeOnClick: false,
 pauseOnHover: true,
 draggable: true,
+className:"border border-gray-700",
 progress: undefined,
 theme: "dark",
   });
@@ -139,7 +141,7 @@ theme: "dark",
 
 function ItemDisplay(image) {
   return (
-    <div class = "flex p-5 ml-10">
+    <div class = "flex p-5 ml-10 z-0">
       <div class="min-h-100 max-h-100 min-w-100 max-w-100  mr-7">
         {ImageDisplay(true, image)}
 
@@ -187,7 +189,7 @@ Vivamus sed augue blandit augue sagittis molestie. Aliquam rhoncus nisl quam, ve
             <input type="text" class=" border border-indigo-600 focus:border-lime-400 focus:outline-hidden py-2 px-4 rounded-lg min-w-100 max-w-100 "></input>
           </div>
           <div>
-            <button class = " bg-blue-700 hover:bg-lime-400 text-white font-bold py-2 px-4 rounded-full min-w-100 max-w-100 mt-5">Place Bid</button>
+            <button class = " bg-blue-700 hover:bg-white hover:text-black text-white font-bold py-2 px-4 rounded-full min-w-100 max-w-100 mt-5">Place Bid</button>
             
           </div>
           
@@ -205,27 +207,114 @@ function NoDisplay() {
     <div>
       <h1>Nothing To Show!</h1>
     </div>
-  )
+  );
 }
 
-function PopupDisplay() {
+const AccountDisplay = () => {
+  return (
+    <div>
+      <form>
+        <div class=" space-y-5">
+          <div class="w-full h-full flex justify-center">
+            <AiOutlineUser class="min-h-20 max-h-20 min-w-20 max-w-20 border-4 rounded-full bg-gray-700"/>
+          </div>
+          <div>
+            <label id="username"><h2>Username:</h2></label>
+            <input type="text" required class ="min-w-100 max-w-100 border rounded-full py-2 px-4" label="username"></input>
+          </div>
+          <div>
+            <label id="password"><h2>Password:</h2></label>
+            <input type="password" required class ="min-w-100 max-w-100 border rounded-full py-2 px-4" label="password"></input>
+          </div>
+          <div>
+            <input type="submit" value="Log In" class="min-w-100 max-w-100 border rounded-full py-2 px-4 bg-blue-700 hover:bg-white hover:text-black"></input>
+          </div>
+          {/* <AiOutlineUser /> */}
+        </div>
+      </form>
+    </div>
+  );
+}
+
+const CreateItem = () => {
+  return(
+    <div>
+      <form>
+        <div class=" flex justify-center p-5 space-x-15 mt-2">
+      <div class="space-y-4">
+        <div>
+          <label id="name_customer" ><h2>Name Of Seller:</h2></label>
+          <input type="text" class ="min-w-100 max-w-100 border rounded-full py-2 px-4" label="name_customer" required></input>
+        </div>
+        <div>
+          <label id="phone_number" ><h2>Phone Number:</h2></label>
+          <input type="text" class ="min-w-100 max-w-100 border rounded-full py-2 px-4" label="phone_number" required></input>
+        </div>
+        
+        <div>
+          <label id="bid_deadline" ><h2>Bid Deadline:</h2></label>
+          <input type="date" class ="min-w-100 max-w-100 border rounded-full py-2 px-4" label="bid_deadline" required></input>
+        </div>
+
+        <div >
+          <label id="product_description" ><h2>Product Description:</h2></label>
+          <textarea rows="5" cols="50" type="submit" placeholder='Product Description' class="border py-2 px-4 font-thin font-sans" label="product_description"></textarea>
+          {/* <input class ="min-w-100 max-w-100 border" label="name_customer"></input> */}
+        </div>
+      </div>
+
+      <div class="space-y-4">
+        <div class="min-h-40 max-h-40 min-w-100 max-w-100 border">
+        
+        </div>
+
+          <div>
+            <label id="starting_bid" required><h2>Starting Bid:</h2></label>
+            <input type="text" class ="min-w-100 max-w-100 border rounded-full py-2 px-4" label="starting_bid"></input>
+          </div>
+          <div>
+            <label id="minimum_bid" required><h2>Minimum Gap Bid:</h2></label>
+            <input type="text" class ="min-w-100 max-w-100 border rounded-full py-2 px-4" label="minimum_bid"></input>
+          </div>
+
+          <div class="mt-10">
+            <input type="submit" value="Create" class="border rounded-full bg-blue-700 hover:bg-white hover:text-black min-w-100 max-w-100 min-h-10 max-h-10"></input>
+          </div>
+
+        
+      </div>
+
+
+      
+      
+    </div>
+      </form>
+    </div>
+    
+
+
+  );
+}
+
+function PopupDisplay(display, commandID, w,h) {
 
   
   return (
 
 
   <el-dialog>
-  <dialog id="dialog" aria-labelledby="dialog-title" class="fixed inset-0 size-auto max-h-none max-w-none overflow-y-auto bg-transparent backdrop:bg-transparent">
+  <dialog id={commandID} aria-labelledby="dialog-title" class="fixed inset-0 size-auto max-h-none max-w-none overflow-y-auto bg-transparent backdrop:bg-transparent">
     <el-dialog-backdrop class="fixed inset-0 z-40 bg-gray-950/20 transition-opacity backdrop-blur-xs data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in"></el-dialog-backdrop>
 
     <div tabIndex="0" class="flex min-h-full items-end justify-center p-4 text-center focus:outline-none sm:items-center sm:p-0">
-      <el-dialog-panel class="relative z-50 flex justify-between min-w-250 max-w-250 min-h-110 max-h-110 bg-slate-900 border-2 border-gray-300 rounded-xl shadow-md p-6 mt-10 mb-10 text-white">
+      <el-dialog-panel class={"relative z-50 flex justify-between bg-slate-900 border-2 border-gray-300 rounded-xl shadow-md p-6 mt-10 mb-10 text-white min-w-" + {w} +"max-w-" + {w} + "min-h-" + {h} + "max-h-" + {h}}>
         <div class="absolute">
-          <button command="close" commandfor="dialog"  class="size-10 border rounded-full font-sans border-indigo-400 text-cyan-400 hover:scale-120 hover:bg-white">X</button>
+          <button command="close" commandfor={commandID}  class="size-10 border rounded-full font-sans border-indigo-400 text-cyan-400 hover:scale-120 hover:bg-white">X</button>
         </div>
         
-        <div>
-        {ItemDisplay(<img src='/src/assets/img1.jpg'></img>)}
+        <div class="">
+        {/* {ItemDisplay(<img src='/src/assets/img1.jpg'></img>)} */}
+        {display}
       </div>
 
       </el-dialog-panel>
@@ -243,7 +332,10 @@ function PromoDisplay() {
         {/* {ItemDisplay()} */}
 
         {/* {ItemDisplay(<img src='/src/assets/img1.jpg'></img>)} */}
-        {ImageDisplay(true, ItemDisplay(<img src='/src/assets/img1.jpg'></img>))}
+        <div class="top-0 z-30">
+                  {ImageDisplay(true, ItemDisplay(<img src='/src/assets/img1.jpg'></img>))}
+
+        </div>
     </div>
   );
 }
@@ -270,16 +362,29 @@ function App() {
         <header >
           <nav class="sticky top-0 z-10 ">
             <div class = "grid grid-cols-2 min-w-full max-w-full">
-          <div class = "flex items-center justify-center m-5 text-5xl text-blue-400 italic font-semibold">
-            <h1>Auction System</h1>
-          </div>
+
+              <div class="flex items-center justify-center">
+                <div class="text-white hover:text-yellow-400 text-4xl mt-2">
+                  <button onClick={notify} class="min-h-10 max-h-10 min-w-10 max-w-10">
+                      <AiFillBell />
+
+                  </button>
+                </div>
+                <div class = "m-5 text-5xl text-blue-400 italic font-semibold">
+                  <h1>Auction System</h1>
+                </div>
+                
+              </div>
+
+
+          
           
           <div class = "flex items-center justify-end mr-20">
             <ul>
               <div class = "flex justify-between space-x-10 text-white">
-                <li><button onClick={notify} class="border min-w-20 max-w-20 min-h-10 max-h-10 rounded-full bg-blue-700 text-white hover:scale-110">Create</button>
+                <li><button command="show-modal" commandfor="create" class="border min-w-20 max-w-20 min-h-10 max-h-10 rounded-full bg-blue-700 text-white hover:scale-110 hover:bg-white hover:text-black">Create</button>
                 </li>
-                <li><button class=" min-w-20 max-w-20 min-h-10 max-h-10 hover:scale-110 hover:rounded-full hover:border hover:bg-white hover:text-black ">Account</button></li>
+                <li><button command="show-modal" commandfor="account" class=" min-w-20 max-w-20 min-h-10 max-h-10 hover:scale-110 hover:rounded-full hover:border hover:bg-white hover:text-black ">Account</button></li>
                 <li><button class=" min-w-20 max-w-20 min-h-10 max-h-10 hover:scale-110 hover:rounded-full hover:border hover:bg-white hover:text-black">Help</button></li>
                 <li><button class=" min-w-20 max-w-20 min-h-10 max-h-10 hover:scale-110 hover:rounded-full hover:border hover:bg-white hover:text-black">About</button></li>
                 
@@ -315,7 +420,10 @@ function App() {
           <PromoDisplay />
           <MainDisplay />
           <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-            <PopupDisplay />
+            {/* <PopupDisplay /> */}
+            {PopupDisplay(CreateItem(), "create",270,140)}
+            {PopupDisplay(AccountDisplay(),"account", 270,140)}
+            {PopupDisplay(ItemDisplay(<img src='/src/assets/img1.jpg'></img>), "info",250,100)}
           </div>
 
         </div>
