@@ -7,9 +7,11 @@ import Modal from 'react-modal';
 import { ToastContainer,toast } from 'react-toastify';
 import { AiFillBell, AiOutlineUser } from "react-icons/ai";
 
+import {Account} from './AccountHandler.jsx';
+
+
 
 function MiniDisplay() {
-
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const openModal = () => setIsModalOpen(true);
@@ -126,17 +128,18 @@ function MiniItemDisplay() {
   ) 
 }
 
-  const notify = () => toast.info("User1241 Place a Bid!", {
-    position: "bottom-left",
-autoClose: 5000,
-hideProgressBar: false,
-closeOnClick: false,
-pauseOnHover: true,
-draggable: true,
-className:"border border-gray-700",
-progress: undefined,
-theme: "dark",
-  });
+ const notify = () => toast.info(
+        bidder + " Place a $" + bid_amount + " Bid! on your #" + product_id, {
+        position: "bottom-left",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: false,
+        pauseOnHover: true,
+        draggable: true,
+        className:"border border-gray-700",
+        progress: undefined,
+        theme: "dark",
+  })
 
 
 function ItemDisplay(image) {
