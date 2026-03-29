@@ -335,7 +335,7 @@ function PromoDisplay() {
         {/* {ItemDisplay()} */}
 
         {/* {ItemDisplay(<img src='/src/assets/img1.jpg'></img>)} */}
-        <div class="top-0 z-30">
+        <div class="top-0 z-30 min-w-235 max-w-235">
                   {ImageDisplay(true, ItemDisplay(<img src='/src/assets/img1.jpg'></img>))}
 
         </div>
@@ -358,6 +358,18 @@ function MainDisplay() {
 }
 
 function App() {
+
+  // const [backendData, setBackendData] = useState([{}])
+
+  // useEffect(()=> {
+  //   fetch("/api").then(
+  //     response=>response.json()
+  //   ).then(
+  //     data=> {
+  //       setBackendData(data)
+  //     }
+  //   )
+  // },[])
 
   return (
     <div class = "font-bold font-display">
