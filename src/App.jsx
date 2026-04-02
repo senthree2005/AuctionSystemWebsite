@@ -6,8 +6,9 @@ import { NextButton } from './CarouselButtons';
 import Modal from 'react-modal';
 import { ToastContainer,toast } from 'react-toastify';
 import { AiFillBell, AiOutlineUser } from "react-icons/ai";
-
+import ReactImageUploading from 'react-images-uploading';
 import {Account} from './AccountHandler.jsx';
+import axios from "axios";
 
 
 
@@ -128,8 +129,21 @@ function MiniItemDisplay() {
   ) 
 }
 
+//  const notify = () => toast.info(
+//         bidder + " Place a $" + bid_amount + " Bid! on your #" + product_id, {
+//         position: "bottom-left",
+//         autoClose: 5000,
+//         hideProgressBar: false,
+//         closeOnClick: false,
+//         pauseOnHover: true,
+//         draggable: true,
+//         className:"border border-gray-700",
+//         progress: undefined,
+//         theme: "dark",
+//   })
+
  const notify = () => toast.info(
-        bidder + " Place a $" + bid_amount + " Bid! on your #" + product_id, {
+        "User12443 Place a $4350.00",  {
         position: "bottom-left",
         autoClose: 5000,
         hideProgressBar: false,
@@ -140,7 +154,6 @@ function MiniItemDisplay() {
         progress: undefined,
         theme: "dark",
   })
-
 
 function ItemDisplay(image) {
   return (
@@ -188,13 +201,16 @@ Vivamus sed augue blandit augue sagittis molestie. Aliquam rhoncus nisl quam, ve
         </div>
         
         <div class="mt-4">
-          <div>
-            <input type="text" class=" border border-indigo-600 focus:border-lime-400 focus:outline-hidden py-2 px-4 rounded-lg min-w-100 max-w-100 "></input>
+          <form>
+            <div>
+            <input type="text" requiredclass=" border border-indigo-600 focus:border-lime-400 focus:outline-hidden py-2 px-4 rounded-lg min-w-100 max-w-100 "></input>
           </div>
           <div>
-            <button class = " bg-blue-700 hover:bg-white hover:text-black text-white font-bold py-2 px-4 rounded-full min-w-100 max-w-100 mt-5">Place Bid</button>
+            <input type="submit" value="Place Bid" class = " bg-blue-700 hover:bg-white hover:text-black text-white font-bold py-2 px-4 rounded-full min-w-100 max-w-100 mt-5"></input>
             
           </div>
+          </form>
+          
           
         </div>
         
@@ -213,28 +229,88 @@ function NoDisplay() {
   );
 }
 
-const AccountDisplay = () => {
+function CreateAccount() {
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirm_password, setConfirmPassword] = useState('');
+  const submitAccount = async (e) => {
+    e.preventDefault()
+    try {
+      if(password!==confirm_password) throw new Error("Must be same password");
+      const response = await axios.post("http://localhost:3000/api/auth/sign", {
+        username,
+        password
+      });
+      console.log("Success: ", response.data);
+    } catch(error) {
+      console.error("Error submitting data: ", error);
+    }
+    
+  }
+
   return (
     <div>
-      <form>
+      <form onSubmit={submitAccount}>
         <div class=" space-y-5">
           <div class="w-full h-full flex justify-center">
             <AiOutlineUser class="min-h-20 max-h-20 min-w-20 max-w-20 border-4 rounded-full bg-gray-700"/>
           </div>
           <div>
             <label id="username"><h2>Username:</h2></label>
-            <input type="text" required class ="min-w-100 max-w-100 border rounded-full py-2 px-4" label="username"></input>
+            <input type="text" value={username} onChange={(e)=>setUsername(e.target.value)} required class ="min-w-100 max-w-100 border rounded-full py-2 px-4" label="username"></input>
           </div>
           <div>
             <label id="password"><h2>Password:</h2></label>
-            <input type="password" required class ="min-w-100 max-w-100 border rounded-full py-2 px-4" label="password"></input>
+            <input type="password" value={password} onChange={(e)=>setPassword(e.target.value)}  required class ="min-w-100 max-w-100 border rounded-full py-2 px-4" label="password"></input>
           </div>
+          <div>
+            <label id="confirm_password"><h2>Confirm Password:</h2></label>
+            <input type="password" value={confirm_password} onChange={(e)=>setConfirmPassword(e.target.value)} required class ="min-w-100 max-w-100 border rounded-full py-2 px-4" label="password"></input>
+          </div>
+          <div>
+            <input type="submit" value="Sign Up" class="min-w-100 max-w-100 border rounded-full py-2 px-4 bg-blue-700 hover:bg-white hover:text-black"></input>
+          </div>
+          {/* <AiOutlineUser /> */}
+        </div>
+      </form>
+    </div>
+  )
+} 
+
+function AccountDisplay () {
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+
+  const loginSubmit = async (e, user) => {
+    e.preventDefault();
+    console.log("Username: " + username);
+    console.log("Password: " + password);
+  }
+
+  return (
+    <div>
+      <form onSubmit={loginSubmit}>
+        <div class=" space-y-5">
+          <div class="w-full h-full flex justify-center">
+            <AiOutlineUser class="min-h-20 max-h-20 min-w-20 max-w-20 border-4 rounded-full bg-gray-700"/>
+          </div>
+          <div>
+            <label id="username"><h2>Username:</h2></label>
+            <input type="text" value={username} onChange={(e)=>setUsername(e.target.value)} required class ="min-w-100 max-w-100 border rounded-full py-2 px-4" label="username"></input>
+          </div>
+          <div>
+            <label id="password"><h2>Password:</h2></label>
+            <input type="password" value={password} onChange={(e)=>setPassword(e.target.value)} required class ="min-w-100 max-w-100 border rounded-full py-2 px-4" label="password"></input>
+          </div>
+
           <div>
             <input type="submit" value="Log In" class="min-w-100 max-w-100 border rounded-full py-2 px-4 bg-blue-700 hover:bg-white hover:text-black"></input>
           </div>
           {/* <AiOutlineUser /> */}
         </div>
       </form>
+      
+
     </div>
   );
 }
@@ -371,6 +447,15 @@ function App() {
   //   )
   // },[])
 
+
+  // const fetchApi = async () => {
+  //   const response = await axios.get("http://localhost:8080/api")
+  //   console.log(response.data.fruits);
+  // }
+  // useEffect(()=> {
+  //   fetchApi()
+  // },[])
+
   return (
     <div class = "font-bold font-display">
       <div class = "bg-gray-950/60 h-25 sticky backdrop-blur-xs border-b-1 rounded-full border-white">
@@ -399,9 +484,10 @@ function App() {
               <div class = "flex justify-between space-x-10 text-white">
                 <li><button command="show-modal" commandfor="create" class="border min-w-20 max-w-20 min-h-10 max-h-10 rounded-full bg-blue-700 text-white hover:scale-110 hover:bg-white hover:text-black">Create</button>
                 </li>
-                <li><button command="show-modal" commandfor="account" class=" min-w-20 max-w-20 min-h-10 max-h-10 hover:scale-110 hover:rounded-full hover:border hover:bg-white hover:text-black ">Account</button></li>
                 <li><button class=" min-w-20 max-w-20 min-h-10 max-h-10 hover:scale-110 hover:rounded-full hover:border hover:bg-white hover:text-black">Help</button></li>
                 <li><button class=" min-w-20 max-w-20 min-h-10 max-h-10 hover:scale-110 hover:rounded-full hover:border hover:bg-white hover:text-black">About</button></li>
+                <li><button command="show-modal" commandfor="account" class=" min-w-20 max-w-20 min-h-10 max-h-10 hover:scale-110 hover:rounded-full hover:border hover:bg-white hover:text-black ">Log In</button></li>
+                <li><button command="show-modal" commandfor="create_account" class=" min-w-20 max-w-20 min-h-10 max-h-10 hover:scale-110 hover:rounded-full hover:border hover:bg-white hover:text-black ">Sign Up</button></li>
                 
                 
                 
@@ -438,6 +524,7 @@ function App() {
             {/* <PopupDisplay /> */}
             {PopupDisplay(CreateItem(), "create",270,140)}
             {PopupDisplay(AccountDisplay(),"account", 270,140)}
+            {PopupDisplay(CreateAccount(),"create_account", 270,140)}
             {PopupDisplay(ItemDisplay(<img src='/src/assets/img1.jpg'></img>), "info",250,100)}
           </div>
 
