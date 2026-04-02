@@ -203,7 +203,7 @@ Vivamus sed augue blandit augue sagittis molestie. Aliquam rhoncus nisl quam, ve
         <div class="mt-4">
           <form>
             <div>
-            <input type="text" requiredclass=" border border-indigo-600 focus:border-lime-400 focus:outline-hidden py-2 px-4 rounded-lg min-w-100 max-w-100 "></input>
+            <input type="text" required class=" border border-indigo-600 focus:border-lime-400 focus:outline-hidden py-2 px-4 rounded-lg min-w-100 max-w-100 "></input>
           </div>
           <div>
             <input type="submit" value="Place Bid" class = " bg-blue-700 hover:bg-white hover:text-black text-white font-bold py-2 px-4 rounded-full min-w-100 max-w-100 mt-5"></input>
@@ -277,43 +277,92 @@ function CreateAccount() {
   )
 } 
 
-function AccountDisplay () {
+const AccountDisplay = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
-  const loginSubmit = async (e, user) => {
+  const loginSubmit = async (e) => {
     e.preventDefault();
-    console.log("Username: " + username);
-    console.log("Password: " + password);
-  }
+
+    try {
+      const res = await fetch("http://localhost:3000/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ username, password })
+      });
+
+      const data = await res.json(); 
+
+      if (res.ok) {
+        console.log(data.accessToken)
+        localStorage.setItem("accessToken", data.accessToken);
+        localStorage.setItem("refreshToken", data.refreshToken);
+
+        const token = data.accessToken;
+
+    
+        const apiClient = axios.create({
+          baseURL: 'http://localhost:3000',
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+        // window.location.href = "http://localhost:3000/posts";
+        const posts = await apiClient.get('/posts');
+        
+      } else {
+        console.log("Login failed");
+      }
+
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
 
   return (
     <div>
       <form onSubmit={loginSubmit}>
-        <div class=" space-y-5">
-          <div class="w-full h-full flex justify-center">
-            <AiOutlineUser class="min-h-20 max-h-20 min-w-20 max-w-20 border-4 rounded-full bg-gray-700"/>
-          </div>
-          <div>
-            <label id="username"><h2>Username:</h2></label>
-            <input type="text" value={username} onChange={(e)=>setUsername(e.target.value)} required class ="min-w-100 max-w-100 border rounded-full py-2 px-4" label="username"></input>
-          </div>
-          <div>
-            <label id="password"><h2>Password:</h2></label>
-            <input type="password" value={password} onChange={(e)=>setPassword(e.target.value)} required class ="min-w-100 max-w-100 border rounded-full py-2 px-4" label="password"></input>
+        <div className="space-y-5">
+          <div className="w-full h-full flex justify-center">
+            <AiOutlineUser className="min-h-20 max-h-20 min-w-20 max-w-20 border-4 rounded-full bg-gray-700"/>
           </div>
 
           <div>
-            <input type="submit" value="Log In" class="min-w-100 max-w-100 border rounded-full py-2 px-4 bg-blue-700 hover:bg-white hover:text-black"></input>
+            <label><h2>Username:</h2></label>
+            <input
+              type="text"
+              value={username}
+              onChange={(e)=>setUsername(e.target.value)}
+              required
+              className="min-w-100 border rounded-full py-2 px-4"
+            />
           </div>
-          {/* <AiOutlineUser /> */}
+
+          <div>
+            <label><h2>Password:</h2></label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e)=>setPassword(e.target.value)}
+              required
+              className="min-w-100 border rounded-full py-2 px-4"
+            />
+          </div>
+
+          <div>
+            <input
+              type="submit"
+              value="Log In"
+              className="min-w-100 border rounded-full py-2 px-4 bg-blue-700 hover:bg-white hover:text-black"
+            />
+          </div>
         </div>
       </form>
-      
-
     </div>
   );
-}
+};
 
 const CreateItem = () => {
   return(
