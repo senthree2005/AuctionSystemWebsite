@@ -309,8 +309,8 @@ const AccountDisplay = () => {
           }
         });
         console.log(token)
-        // window.location.href = '/'
-        const posts = await apiClient.get('/posts');
+        window.location.href = '/'
+        // const posts = await apiClient.get('/posts');
         
       } else {
         console.log("Login failed");
@@ -483,30 +483,34 @@ function MainDisplay() {
 }
 
 function App() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  // const [backendData, setBackendData] = useState([{}])
-
-  // useEffect(()=> {
-  //   fetch("/api").then(
-  //     response=>response.json()
-  //   ).then(
-  //     data=> {
-  //       setBackendData(data)
-  //     }
-  //   )
-  // },[])
-
-
-  // const fetchApi = async () => {
-  //   const response = await axios.get("http://localhost:8080/api")
-  //   console.log(response.data.fruits);
-  // }
-  // useEffect(()=> {
-  //   fetchApi()
-  // },[])
   useEffect(() => {
     checkForLogin();
   },[])
+
+  const logOut = async () => {
+    try {
+      const refreshToken = localStorage.getItem("refreshToken");
+
+      await axios.delete("http://localhost:3000/api/auth/logout", {
+        data: { token: refreshToken }
+      });
+
+    } catch (err) {
+        console.log("Logout API error:", err.response?.data || err.message);
+    }
+
+
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("refreshToken");
+
+    console.log("Logged out, tokens removed");
+
+    window.location.href = "/";
+  }
+
+  
 
 
   const checkForLogin = async () => {
@@ -522,10 +526,12 @@ function App() {
         });
 
         console.log("SUCCESS:", response.data);
+        setIsLoggedIn(true)
+        // secondButton = <button class=" min-w-20 max-w-20 min-h-10 max-h-10 hover:scale-110 hover:rounded-full hover:border hover:bg-white hover:text-black ">Acount</button>
+        // lastButton = <button class=" min-w-20 max-w-20 min-h-10 max-h-10 hover:scale-110 hover:rounded-full hover:border hover:bg-white hover:text-black ">Log Out</button>
 
     } catch (error) {
         if (error.response) {
-            // Server responded with error status
             if(error.response.status === 401 || error.response.status === 403) {
               localStorage.removeItem('accessToken');
               console.log(localStorage.getItem('accessToken'))
@@ -534,11 +540,11 @@ function App() {
                 console.log("No token provided");
             } else if (error.response.status === 403) {
                 console.log("Invalid or expired token");
+                setIsLoggedIn(false)
             } else {
                 console.log("Other error:", error.response.data);
             }
         } else {
-            // Network or other error
             console.log("Request failed:", error.message);
         }
     }
@@ -573,8 +579,14 @@ function App() {
                 </li>
                 <li><button class=" min-w-20 max-w-20 min-h-10 max-h-10 hover:scale-110 hover:rounded-full hover:border hover:bg-white hover:text-black">Help</button></li>
                 <li><button class=" min-w-20 max-w-20 min-h-10 max-h-10 hover:scale-110 hover:rounded-full hover:border hover:bg-white hover:text-black">About</button></li>
-                <li><button command="show-modal" commandfor="account" class=" min-w-20 max-w-20 min-h-10 max-h-10 hover:scale-110 hover:rounded-full hover:border hover:bg-white hover:text-black ">Log In</button></li>
-                <li><button command="show-modal" commandfor="create_account" class=" min-w-20 max-w-20 min-h-10 max-h-10 hover:scale-110 hover:rounded-full hover:border hover:bg-white hover:text-black ">Sign Up</button></li>
+                <li>{
+                isLoggedIn ? ( <button className="min-w-20 max-w-20 min-h-10 max-h-10 hover:scale-110 hover:rounded-full hover:border hover:bg-white hover:text-black">Account</button>) : 
+                             ( <button className="min-w-20 max-w-20 min-h-10 max-h-10 hover:scale-110 hover:rounded-full hover:border hover:bg-white hover:text-black" command="show-modal" commandfor="account">Log In</button>)}
+                </li>
+
+                <li> {isLoggedIn ? (<button onClick={logOut} className="min-w-20 max-w-20 min-h-10 max-h-10 hover:scale-110 hover:rounded-full hover:border hover:bg-white hover:text-black">Log Out</button>) : 
+                                   (<button className="min-w-20 max-w-20 min-h-10 max-h-10 hover:scale-110 hover:rounded-full hover:border hover:bg-white hover:text-black" command="show-modal"commandfor="create_account">Sign Up</button>)}
+                </li>
                 
                 
                 

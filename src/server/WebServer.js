@@ -132,7 +132,7 @@ app.delete('/api/auth/logout', (req, res) => {
 })
 
 function generateAccessToken(user) {
-  return jwt.sign({username: user}, process.env.ACCESS_TOKEN_SECRET, {expiresIn: '15s'})
+  return jwt.sign({username: user}, process.env.ACCESS_TOKEN_SECRET, {expiresIn: '10s'})
 }
 
 
