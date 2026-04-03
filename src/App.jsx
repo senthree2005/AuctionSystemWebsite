@@ -296,8 +296,7 @@ const AccountDisplay = () => {
       const data = await res.json(); 
 
       if (res.ok) {
-        console.log(data.accessToken)
-        localStorage.setItem("accessToken", data.accessToken);
+        localStorage.setItem("accessToken",data.accessToken);
         localStorage.setItem("refreshToken", data.refreshToken);
 
         const token = data.accessToken;
@@ -309,7 +308,8 @@ const AccountDisplay = () => {
             Authorization: `Bearer ${token}`
           }
         });
-        // window.location.href = "http://localhost:3000/posts";
+        console.log(token)
+        // window.location.href = '/'
         const posts = await apiClient.get('/posts');
         
       } else {
@@ -504,6 +504,45 @@ function App() {
   // useEffect(()=> {
   //   fetchApi()
   // },[])
+  useEffect(() => {
+    checkForLogin();
+  },[])
+
+
+  const checkForLogin = async () => {
+    try {
+        
+        const token = localStorage.getItem('accessToken');
+        console.log(token)
+        console.log("Loaded!")
+        const response = await axios.get('http://localhost:3000/posts', {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        });
+
+        console.log("SUCCESS:", response.data);
+
+    } catch (error) {
+        if (error.response) {
+            // Server responded with error status
+            if(error.response.status === 401 || error.response.status === 403) {
+              localStorage.removeItem('accessToken');
+              console.log(localStorage.getItem('accessToken'))
+            }
+            if (error.response.status === 401) {
+                console.log("No token provided");
+            } else if (error.response.status === 403) {
+                console.log("Invalid or expired token");
+            } else {
+                console.log("Other error:", error.response.data);
+            }
+        } else {
+            // Network or other error
+            console.log("Request failed:", error.message);
+        }
+    }
+  }
 
   return (
     <div class = "font-bold font-display">
@@ -524,7 +563,6 @@ function App() {
                 </div>
                 
               </div>
-
 
           
           

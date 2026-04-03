@@ -79,9 +79,8 @@ app.post('/api/auth/login', async (req, res) => {
         if (!isMatch) {
             return res.status(401).send("Invalid credentials");
         }
-        const accessToken = generateAccessToken(username)
-        const refreshToken =jwt.sign(username, process.env.REFRESH_TOKEN_SECRET)
-        refreshTokens.push(refreshToken)
+        const accessToken = generateAccessToken({ id: user.id, username: user.username });
+        const refreshToken = jwt.sign({ id: user.id, username: user.username }, process.env.REFRESH_TOKEN_SECRET);        refreshTokens.push(refreshToken)
         res.status(200).json({
             message: "Login successful",
             accessToken,
@@ -91,24 +90,41 @@ app.post('/api/auth/login', async (req, res) => {
                 username: user.username
             }
         });
+        
     });
 });
 
 app.get('/posts', authenticateToken, (req, res) => {
-  console.log("Reach")
-//   res.redirect("/posts")
+
+    res.status(200).json({
+        message: "Access granted to protected route",
+        user: req.user
+    });
 })
 
 function authenticateToken(req, res, next) {
   const authHeader = req.headers['authorization']
   const token = authHeader && authHeader.split(' ')[1]
-  if (token == null) return res.sendStatus(401)
 
-  jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
-    if (err) return res.sendStatus(403)
-    req.user = user
-    next()
-  })
+    if (!token) {
+        return res.status(401).json({
+            error: "Access denied. No token provided."
+        });
+    }
+
+    console.log("SECRET:", process.env.ACCESS_TOKEN_SECRET);
+
+    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
+
+        if (err) {
+            return res.status(403).json({
+                error: "Invalid or expired token."
+            });
+        }
+
+        req.user = user;
+        next();
+    });
 }
 app.delete('/api/auth/logout', (req, res) => {
   refreshTokens = refreshTokens.filter(token => token !== req.body.token)
@@ -116,7 +132,7 @@ app.delete('/api/auth/logout', (req, res) => {
 })
 
 function generateAccessToken(user) {
-  return jwt.sign(user, process.env.ACCESS_TOKEN_SECRET)
+  return jwt.sign({username: user}, process.env.ACCESS_TOKEN_SECRET, {expiresIn: '15s'})
 }
 
 
