@@ -49,14 +49,6 @@ app.get('/display_item', async (req, res)=> {
     })
 })
 
-app.get('/specific_item', async (req, res) => {
-    const product_id = req.body
-    const q = 'SELECT * FROM item WHERE product_id = ?'
-    con.execute(q,[product_id] ,(err, result) => {
-        console.log("Product_ID: ", product_id)
-        res.json(result)
-    })
-})
 
 app.post('/create_item', authenticateToken, async (req, res) => {
   const { product_name, product_description, deadline_date, starting_bid, minimum_bid, phone_number } = req.body;

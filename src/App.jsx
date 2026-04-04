@@ -42,7 +42,14 @@ function MiniDisplay({content}) {
             <div class = "min-h-50 max-h-50 min-w-50 max-w-50 p-5">
               <div class = "grid grid-rows-2">
                 <div>
-                {ImageDisplay(false, <img src='/src/assets/img1.jpg'></img>)}
+                {/* {ImageDisplay(false, <img src='/src/assets/img1.jpg'></img>)} */}
+                <ImageDisplay autoplayState={false} 
+                elementDisplay={
+            <div className="embla__slide">
+                    <img src='/src/assets/img1.jpg'></img>
+                  </div>
+          }
+                />
                 </div>
 
                 <div class="font-thin mt-2">
@@ -88,7 +95,7 @@ function MiniDisplay({content}) {
 
 }
 
-function ImageDisplay(autoplayState, elementDisplay) {
+function ImageDisplay({autoplayState, elementDisplay}) {
   const autoplayOptions = { delay: 3000 }; 
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true }, [Autoplay(autoplayOptions)])
 
@@ -114,7 +121,8 @@ function ImageDisplay(autoplayState, elementDisplay) {
     <div className="embla">
       <div className="embla__viewport" ref={emblaRef}>
         <div className="embla__container">
-          <div className = "embla__slide">
+          {elementDisplay}
+          {/* <div className = "embla__slide">
             {elementDisplay}
           </div>
 
@@ -123,7 +131,7 @@ function ImageDisplay(autoplayState, elementDisplay) {
           </div>
           <div className = "embla__slide">
             {elementDisplay}
-          </div>
+          </div> */}
             
         </div>
       </div>
@@ -210,19 +218,24 @@ function ItemDisplay({content}) {
     <div class = "flex p-5 ml-10 z-0">
       <div class="min-h-100 max-h-100 min-w-100 max-w-100  mr-7">
         {/* {ImageDisplay(true, image)} */}
-        <ImageDisplay isOpen={true}>
-          {/* {image} */}
-        </ImageDisplay>
+        <ImageDisplay
+          autoplayState={true}
+          elementDisplay={
+            <div className="embla__slide">
+                    <img src='/src/assets/img1.jpg'></img>
+                  </div>
+          }
+        />
         <div class="grid grid-cols-2 mt-2">
           <div>
             <p>Time Remaining: {content.deadline_date}</p>
             <br></br>
-            <div>
+            <div class="text-left">
               <h3>Current Highest Bid: </h3>
               <h2 class="text-lime-400">{formatter.format(content.starting_bid.toFixed(2))}</h2>
 
               <h3>Minimum Bid: </h3>
-              <h2 class="text-lime-600">{formatter.format(content.minimum_bid.toFixed(2))}</h2>
+              <h2 class="text-lime-600">{formatter.format((content.starting_bid + content.minimum_bid).toFixed(2))}</h2>
             </div>
           </div>
           
@@ -241,7 +254,7 @@ function ItemDisplay({content}) {
 
 
       <div class = "grid-rows-2">
-        <div class="overflow-y-auto min-w-100 max-w-100 min-h-60 max-h-60">
+        <div class="overflow-y-auto min-w-100 max-w-100 min-h-60 max-h-60 text-left">
           <h1 class="text-2xl">{content.product_name}
             </h1>     
             <p class="font-thin font-sans"> {content.product_description}
@@ -266,14 +279,6 @@ function ItemDisplay({content}) {
     </div>
 
 
-  );
-}
-
-function NoDisplay() {
-  return(
-    <div>
-      <h1>Nothing To Show!</h1>
-    </div>
   );
 }
 
@@ -532,7 +537,7 @@ function PopupDisplay({display, commandID, w,h,onClose}) {
     <div tabIndex="0" class="flex min-h-full items-end justify-center p-4 text-center focus:outline-none sm:items-center sm:p-0">
       <el-dialog-panel class={"relative z-50 flex justify-between bg-slate-900 border-2 border-gray-300 rounded-xl shadow-md p-6 mt-10 mb-10 text-white min-w-" + {w} +"max-w-" + {w} + "min-h-" + {h} + "max-h-" + {h}}>
         <div class="absolute">
-          <button  onClick={onClose}  commandfor={commandID}  class="size-10 border rounded-full font-sans border-indigo-400 text-cyan-400 hover:scale-120 hover:bg-white">X</button>
+          <button  onClick={onClose} command="close"  commandfor={commandID}  class="size-10 border rounded-full font-sans border-indigo-400 text-cyan-400 hover:scale-120 hover:bg-white">X</button>
         </div>
         
         <div class="">
@@ -550,7 +555,8 @@ function PopupDisplay({display, commandID, w,h,onClose}) {
 }
 
 function PromoDisplay() {
-  const [item, setItems] = useState(null)
+  const [item, setItems] = useState([])
+  
   const readItem = async () => {
   try {
     const response = await axios.get(hostURL + "/display_item")
@@ -565,12 +571,40 @@ function PromoDisplay() {
   useEffect(() => {
   readItem()
 }, [])
+
+  const itemsDisplay = () => {
+    
+  }
   return (
     <div class= "flex justify-between min-w-250 max-w-250 min-h-110 max-h-110 backdrop-blur-xs bg-slate-900/80 border-2 border-gray-300 rounded-xl shadow-md p-6 mt-10 mb-10 text-white">
         {/* {ItemDisplay()} */}
 
         {/* {ItemDisplay(<img src='/src/assets/img1.jpg'></img>)} */}
         <div class="top-0 z-30 min-w-235 max-w-235">
+
+          <ImageDisplay
+              autoplayState={true}
+              elementDisplay={
+                item.slice(0, 3).map((itm, index) => (
+                  <div className="embla__slide" key={index}>
+                    <ItemDisplay content={itm} />
+                  </div>
+                ))
+              }
+            />
+{/* 
+          {item.slice(0, 3).map((itm, index) => (
+            <ImageDisplay
+              key={index}
+              autoplayState={true}
+              elementDisplay={
+                <div className="embla__slide">
+                  <ItemDisplay content={itm} />
+                </div>
+              }
+            />
+          ))} */}
+          
                   {/* {ImageDisplay(true, <ItemDisplay content={content}/>)} */}
 
         </div>
