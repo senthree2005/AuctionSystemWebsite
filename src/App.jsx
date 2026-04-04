@@ -9,7 +9,7 @@ import { AiFillBell, AiOutlineUser } from "react-icons/ai";
 import ReactImageUploading from 'react-images-uploading';
 import {Account} from './AccountHandler.jsx';
 import axios from "axios";
-
+const hostURL = "http://localhost:3000"
 
 
 function MiniDisplay() {
@@ -237,11 +237,12 @@ function CreateAccount() {
     e.preventDefault()
     try {
       if(password!==confirm_password) throw new Error("Must be same password");
-      const response = await axios.post("http://localhost:3000/api/auth/sign", {
+      const response = await axios.post(hostURL+"/api/auth/sign", {
         username,
         password
       });
       console.log("Success: ", response.data);
+      window.location.href="/"
     } catch(error) {
       console.error("Error submitting data: ", error);
     }
@@ -285,7 +286,7 @@ const AccountDisplay = () => {
     e.preventDefault();
 
     try {
-      const res = await fetch("http://localhost:3000/api/auth/login", {
+      const res = await fetch(hostURL+"/api/auth/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -303,7 +304,7 @@ const AccountDisplay = () => {
 
     
         const apiClient = axios.create({
-          baseURL: 'http://localhost:3000',
+          baseURL: hostURL,
           headers: {
             Authorization: `Bearer ${token}`
           }
@@ -365,28 +366,73 @@ const AccountDisplay = () => {
 };
 
 const CreateItem = () => {
+  const [product_name, setProductName] = useState('')
+  const [product_description, setProductDescription] = useState('')
+  const [deadline_date, setDeadlineDate] = useState('')
+  const [starting_bid, setStartingBid] = useState(0.0)
+  const [minimum_bid, setMinimumBid] = useState(0.0)
+  const [phone_number, setPhoneNumber] = useState(0)
+
+
+  const addItem = async (e) => {
+  e.preventDefault();
+
+  const seller_username = await getUserName();
+  if (!seller_username) {
+    console.error("User not logged in.");
+    return;
+  }
+
+  console.log("Seller username:", seller_username);
+
+  try {
+    const token = localStorage.getItem('accessToken');
+    if (!token) throw new Error("No access token");
+
+    const response = await axios.post(
+      hostURL + "/create_item",
+      {
+        product_name,
+        product_description,
+        deadline_date,
+        starting_bid,
+        minimum_bid,
+        phone_number
+      },
+      {
+        headers: { Authorization: `Bearer ${token}` }
+      }
+    );
+
+    console.log("Success:", response.data);
+
+  } catch (error) {
+    console.error("Error submitting data:", error.response?.data || error.message);
+  }
+};
+
   return(
     <div>
-      <form>
+      <form onSubmit={addItem}>
         <div class=" flex justify-center p-5 space-x-15 mt-2">
       <div class="space-y-4">
         <div>
-          <label id="name_customer" ><h2>Name Of Seller:</h2></label>
-          <input type="text" class ="min-w-100 max-w-100 border rounded-full py-2 px-4" label="name_customer" required></input>
+          <label id="product_name" ><h2>Product Title:</h2></label>
+          <input type="text" value={product_name} onChange={(e)=>setProductName(e.target.value)} class ="min-w-100 max-w-100 border rounded-full py-2 px-4" label="name_customer" required></input>
         </div>
         <div>
           <label id="phone_number" ><h2>Phone Number:</h2></label>
-          <input type="text" class ="min-w-100 max-w-100 border rounded-full py-2 px-4" label="phone_number" required></input>
+          <input type="text" value={phone_number} onChange={(e)=>setPhoneNumber(e.target.value)} class ="min-w-100 max-w-100 border rounded-full py-2 px-4" label="phone_number" required></input>
         </div>
         
         <div>
           <label id="bid_deadline" ><h2>Bid Deadline:</h2></label>
-          <input type="date" class ="min-w-100 max-w-100 border rounded-full py-2 px-4" label="bid_deadline" required></input>
+          <input type="date" value={deadline_date} onChange={(e)=>setDeadlineDate(e.target.value)} class ="min-w-100 max-w-100 border rounded-full py-2 px-4" label="bid_deadline" required></input>
         </div>
 
         <div >
           <label id="product_description" ><h2>Product Description:</h2></label>
-          <textarea rows="5" cols="50" type="submit" placeholder='Product Description' class="border py-2 px-4 font-thin font-sans" label="product_description"></textarea>
+          <textarea rows="5" cols="50" type="submit" value={product_description} onChange={(e)=>setProductDescription(e.target.value)} placeholder='Product Description' class="border py-2 px-4 font-thin font-sans" label="product_description"></textarea>
           {/* <input class ="min-w-100 max-w-100 border" label="name_customer"></input> */}
         </div>
       </div>
@@ -398,11 +444,11 @@ const CreateItem = () => {
 
           <div>
             <label id="starting_bid" required><h2>Starting Bid:</h2></label>
-            <input type="text" class ="min-w-100 max-w-100 border rounded-full py-2 px-4" label="starting_bid"></input>
+            <input type="text" value={starting_bid} onChange={(e)=>setStartingBid(e.target.value)} class ="min-w-100 max-w-100 border rounded-full py-2 px-4" label="starting_bid"></input>
           </div>
           <div>
             <label id="minimum_bid" required><h2>Minimum Gap Bid:</h2></label>
-            <input type="text" class ="min-w-100 max-w-100 border rounded-full py-2 px-4" label="minimum_bid"></input>
+            <input type="text" value={minimum_bid} onChange={(e)=>setMinimumBid(e.target.value)} class ="min-w-100 max-w-100 border rounded-full py-2 px-4" label="minimum_bid"></input>
           </div>
 
           <div class="mt-10">
@@ -482,9 +528,26 @@ function MainDisplay() {
     
 }
 
+const getUserName = async () => {
+  try {
+    const token = localStorage.getItem('accessToken');
+    if (!token) return null;
+
+    const response = await axios.get(hostURL + '/posts', {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+
+    return response.data.user.username;
+
+  } catch (error) {
+    console.error("Error fetching username:", error);
+    return null;
+  }
+};
+
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-
+  const [navUser, setNavUser] = useState('Account');
   useEffect(() => {
     checkForLogin();
   },[])
@@ -493,7 +556,7 @@ function App() {
     try {
       const refreshToken = localStorage.getItem("refreshToken");
 
-      await axios.delete("http://localhost:3000/api/auth/logout", {
+      await axios.delete(hostURL+"/api/auth/logout", {
         data: { token: refreshToken }
       });
 
@@ -509,45 +572,14 @@ function App() {
 
     window.location.href = "/";
   }
-
   
 
 
   const checkForLogin = async () => {
-    try {
-        
-        const token = localStorage.getItem('accessToken');
-        console.log(token)
-        console.log("Loaded!")
-        const response = await axios.get('http://localhost:3000/posts', {
-            headers: {
-                Authorization: `Bearer ${token}`
-            }
-        });
-
-        console.log("SUCCESS:", response.data);
-        setIsLoggedIn(true)
-        // secondButton = <button class=" min-w-20 max-w-20 min-h-10 max-h-10 hover:scale-110 hover:rounded-full hover:border hover:bg-white hover:text-black ">Acount</button>
-        // lastButton = <button class=" min-w-20 max-w-20 min-h-10 max-h-10 hover:scale-110 hover:rounded-full hover:border hover:bg-white hover:text-black ">Log Out</button>
-
-    } catch (error) {
-        if (error.response) {
-            if(error.response.status === 401 || error.response.status === 403) {
-              localStorage.removeItem('accessToken');
-              console.log(localStorage.getItem('accessToken'))
-            }
-            if (error.response.status === 401) {
-                console.log("No token provided");
-            } else if (error.response.status === 403) {
-                console.log("Invalid or expired token");
-                setIsLoggedIn(false)
-            } else {
-                console.log("Other error:", error.response.data);
-            }
-        } else {
-            console.log("Request failed:", error.message);
-        }
-    }
+    
+     const username = await getUserName();
+    setNavUser(username);
+    setIsLoggedIn(username !== null);
   }
 
   return (
@@ -580,7 +612,7 @@ function App() {
                 <li><button class=" min-w-20 max-w-20 min-h-10 max-h-10 hover:scale-110 hover:rounded-full hover:border hover:bg-white hover:text-black">Help</button></li>
                 <li><button class=" min-w-20 max-w-20 min-h-10 max-h-10 hover:scale-110 hover:rounded-full hover:border hover:bg-white hover:text-black">About</button></li>
                 <li>{
-                isLoggedIn ? ( <button className="min-w-20 max-w-20 min-h-10 max-h-10 hover:scale-110 hover:rounded-full hover:border hover:bg-white hover:text-black">Account</button>) : 
+                isLoggedIn ? ( <button className="min-w-20 max-w-20 min-h-10 max-h-10 hover:scale-110 hover:rounded-full hover:border hover:bg-white hover:text-black">{navUser}</button>) : 
                              ( <button className="min-w-20 max-w-20 min-h-10 max-h-10 hover:scale-110 hover:rounded-full hover:border hover:bg-white hover:text-black" command="show-modal" commandfor="account">Log In</button>)}
                 </li>
 
