@@ -46,7 +46,7 @@ function MiniDisplay({content}) {
                 <ImageDisplay autoplayState={false} 
                 elementDisplay={
             <div className="embla__slide">
-                    <img src='/src/assets/img1.jpg'></img>
+                    <img src='/src/assets/img1.jpg' class="w-[300px] h-[70px] object-cover rounded-lg shadow-md"></img>
                   </div>
           }
                 />
@@ -222,7 +222,7 @@ function ItemDisplay({content}) {
           autoplayState={true}
           elementDisplay={
             <div className="embla__slide">
-                    <img src='/src/assets/img1.jpg'></img>
+                    <img src='/src/assets/img1.jpg' class="w-[400px] h-[200px] object-cover rounded-lg shadow-md" ></img>
                   </div>
           }
         />
