@@ -12,11 +12,30 @@ import axios from "axios";
 const hostURL = "http://localhost:3000"
 
 
-function MiniDisplay() {
+const formatter = new Intl.NumberFormat('en-US', {
+  style: 'currency',
+  currency: 'USD',
+  trailingZeroDisplay: 'stripIfInteger'
+});
+
+
+function MiniDisplay({content}) {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [specificContent, setContent] = useState(null)
 
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
+  // setProductID(content.product_id)
+  // const getItemData = async () => {
+  //   try {
+  //     const response = await axios.get(hostURL + "/specific_item", {
+  //       product_id
+  //     })
+
+  //   } catch(error) {
+
+  //   }
+  // }
 
   return (
           <div class="bg-indigo-950 w-100 h-40 border border-blue-400 rounded-xl grid grid-cols-2">
@@ -28,7 +47,7 @@ function MiniDisplay() {
 
                 <div class="font-thin mt-2">
                   <p>Current Bid:</p>
-                  <p class="font-bold text-lime-400">$10,240,000.00</p>
+                  <p class="font-bold text-lime-400">{formatter.format(content.starting_bid.toFixed(2))}</p>
                 </div>
               </div>
                
@@ -38,16 +57,27 @@ function MiniDisplay() {
 
               <div class="p-2 overflow-y-auto min-h-25 max-h-25">
                 <h2>
-                  Lot for Sale
+                  {content.product_name}
                 </h2>
                 <p class = "font-thin">
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent maximus erat id lacinia convallis. Nunc sapien lectus, laoreet tristique velit id, porttitor pellentesque ante. Curabitur malesuada eleifend velit, sed cursus ligula pretium sit amet. Phasellus rhoncus elit ut accumsan gravida. Sed accumsan mauris eget erat fringilla ullamcorper
+                  {content.product_description}
                 </p>
               </div>
 
               <div>
-                <button command="show-modal" commandfor="info" class = " bg-blue-700 hover:bg-white hover:text-black text-white font-semibold text-xs rounded-full h-5 w-45 mt-4">Click for more information.</button>
+                <button command="show-modal" commandfor="info" onClick={() => {setContent(content);setIsModalOpen(true)}} class = " bg-blue-700 hover:bg-white hover:text-black text-white font-semibold text-xs rounded-full h-5 w-45 mt-4">Click for more information.</button>
+                {/* {PopupDisplay(<ItemDisplay content={specificContent} />, "info",250,100)} */}
                 
+                {isModalOpen && specificContent && (
+                <PopupDisplay
+                  display={<ItemDisplay content={specificContent} />}
+                  commandID="info"
+                  w={250}
+                  h={100}
+                  onClose={() => setIsModalOpen(false)}
+                />
+              )}
+               
               </div>
             </div>
 
@@ -105,23 +135,42 @@ function ImageDisplay(autoplayState, elementDisplay) {
   )
 }
 function MiniItemDisplay() {
+  //   const items = []
+  // for(let i=0;i<25;i++) {
+  //   items.push(<MiniDisplay/>)
+  // }
+  const [items, setItems] = useState([])
+  
+  
+
+  
+  const readItem = async () => {
+  try {
+    const response = await axios.get(hostURL + "/display_item")
+    setItems(response.data)
+
+
+  }  catch (error) {
+      console.error("Error fetching items:", error)
+    }
+  }
+
+  useEffect(() => {
+  readItem()
+}, [])
+  
   return(
     <div>
       <div class="mb-5">
           <input type="text" class=" border border-indigo-600 focus:border-white focus:outline-hidden rounded-full min-w-full max-w-full min-h-10 max-h-10 px-4 py-2"placeholder='Search'></input>
       </div>
       <div class = "grid grid-cols-2 gap-x-25 gap-y-10">
-        <MiniDisplay />
-            <MiniDisplay />
 
-      <MiniDisplay />
+      {items.map((item, index) => (
+        <MiniDisplay key={index} content={item} />
+      ))}
+    
 
-      <MiniDisplay />
-
-      <MiniDisplay />
-
-      <MiniDisplay />
-      
       </div>
       
 
@@ -155,32 +204,35 @@ function MiniItemDisplay() {
         theme: "dark",
   })
 
-function ItemDisplay(image) {
+function ItemDisplay({content}) {
+
   return (
     <div class = "flex p-5 ml-10 z-0">
       <div class="min-h-100 max-h-100 min-w-100 max-w-100  mr-7">
-        {ImageDisplay(true, image)}
-
+        {/* {ImageDisplay(true, image)} */}
+        <ImageDisplay isOpen={true}>
+          {/* {image} */}
+        </ImageDisplay>
         <div class="grid grid-cols-2 mt-2">
           <div>
-            <p>Time Remaining: 6:23:42</p>
+            <p>Time Remaining: {content.deadline_date}</p>
             <br></br>
             <div>
               <h3>Current Highest Bid: </h3>
-              <h2 class="text-lime-400">$4,431.00</h2>
+              <h2 class="text-lime-400">{formatter.format(content.starting_bid.toFixed(2))}</h2>
 
               <h3>Minimum Bid: </h3>
-              <h2 class="text-lime-600">$4,600.00</h2>
+              <h2 class="text-lime-600">{formatter.format(content.minimum_bid.toFixed(2))}</h2>
             </div>
           </div>
           
           <div class="text-end">
             <p>Auctioneer:</p>
-            <h2 class="font-thin">Cedrick C. Senados</h2>
+            <h2 class="font-thin">{content.seller_username}</h2>
             <br></br>
 
             <p>Phone Number:</p>
-            <h2 class="font-thin">09662997866</h2>
+            <h2 class="font-thin">{content.phone_number}</h2>
           </div>
           
         </div>
@@ -190,13 +242,9 @@ function ItemDisplay(image) {
 
       <div class = "grid-rows-2">
         <div class="overflow-y-auto min-w-100 max-w-100 min-h-60 max-h-60">
-          <h1 class="text-2xl">House and Lot for Sale 165 SQM Fully Titled Near GYM PUROK 1 LA FILIPINA
+          <h1 class="text-2xl">{content.product_name}
             </h1>     
-            <p class="font-thin font-sans"> Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent maximus erat id lacinia convallis. Nunc sapien lectus, laoreet tristique velit id, porttitor pellentesque ante. Curabitur malesuada eleifend velit, sed cursus ligula pretium sit amet. Phasellus rhoncus elit ut accumsan gravida. Sed accumsan mauris eget erat fringilla ullamcorper. Pellentesque placerat tellus at diam dapibus, quis porttitor nunc elementum. Nam tortor purus, volutpat vel tempus facilisis, ultrices sollicitudin nunc. Nullam purus ligula, fringilla in augue at, volutpat condimentum felis.
-
-Cras scelerisque lobortis rhoncus. Duis neque diam, convallis ut tellus quis, porta malesuada tortor. In fermentum est id magna dapibus, eget porta sem luctus. Sed maximus metus in augue lacinia sagittis nec sit amet ex. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Donec quis augue diam. Sed sodales tellus turpis, id interdum risus sagittis a. Nulla luctus libero eu mauris ultricies maximus. Duis scelerisque blandit diam, a viverra tellus faucibus ut. Suspendisse volutpat et metus a euismod.
-
-Vivamus sed augue blandit augue sagittis molestie. Aliquam rhoncus nisl quam, vel imperdiet ex facilisis nec. Quisque tristique placerat diam in laoreet. Maecenas nec orci quam. Duis neque risus, efficitur finibus blandit a, ultrices ac leo. Sed commodo varius dui id fringilla. Duis interdum neque vehicula odio euismod convallis. Praesent quis porttitor mauris. Fusce at eleifend tellus. Proin vestibulum nisi eros, eget fringilla nulla vulputate vel. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Phasellus molestie vestibulum lacus, ut posuere tortor. Vestibulum rutrum, sem ac pharetra condimentum, ipsum lorem dignissim leo, vitae pulvinar lectus libero feugiat risus. Praesent ut neque in enim rutrum tincidunt consequat a ante. Sed ultrices finibus nibh, ac porttitor neque elementum in. Fusce laoreet facilisis dolor, elementum hendrerit sapien egestas et. 
+            <p class="font-thin font-sans"> {content.product_description}
               </p>   
         </div>
         
@@ -405,6 +453,7 @@ const CreateItem = () => {
     );
 
     console.log("Success:", response.data);
+    window.location.href = '/'
 
   } catch (error) {
     console.error("Error submitting data:", error.response?.data || error.message);
@@ -470,7 +519,7 @@ const CreateItem = () => {
   );
 }
 
-function PopupDisplay(display, commandID, w,h) {
+function PopupDisplay({display, commandID, w,h,onClose}) {
 
   
   return (
@@ -483,7 +532,7 @@ function PopupDisplay(display, commandID, w,h) {
     <div tabIndex="0" class="flex min-h-full items-end justify-center p-4 text-center focus:outline-none sm:items-center sm:p-0">
       <el-dialog-panel class={"relative z-50 flex justify-between bg-slate-900 border-2 border-gray-300 rounded-xl shadow-md p-6 mt-10 mb-10 text-white min-w-" + {w} +"max-w-" + {w} + "min-h-" + {h} + "max-h-" + {h}}>
         <div class="absolute">
-          <button command="close" commandfor={commandID}  class="size-10 border rounded-full font-sans border-indigo-400 text-cyan-400 hover:scale-120 hover:bg-white">X</button>
+          <button  onClick={onClose}  commandfor={commandID}  class="size-10 border rounded-full font-sans border-indigo-400 text-cyan-400 hover:scale-120 hover:bg-white">X</button>
         </div>
         
         <div class="">
@@ -501,13 +550,28 @@ function PopupDisplay(display, commandID, w,h) {
 }
 
 function PromoDisplay() {
+  const [item, setItems] = useState(null)
+  const readItem = async () => {
+  try {
+    const response = await axios.get(hostURL + "/display_item")
+    setItems(response.data)
+
+
+  }  catch (error) {
+      console.error("Error fetching items:", error)
+    }
+  }
+
+  useEffect(() => {
+  readItem()
+}, [])
   return (
     <div class= "flex justify-between min-w-250 max-w-250 min-h-110 max-h-110 backdrop-blur-xs bg-slate-900/80 border-2 border-gray-300 rounded-xl shadow-md p-6 mt-10 mb-10 text-white">
         {/* {ItemDisplay()} */}
 
         {/* {ItemDisplay(<img src='/src/assets/img1.jpg'></img>)} */}
         <div class="top-0 z-30 min-w-235 max-w-235">
-                  {ImageDisplay(true, ItemDisplay(<img src='/src/assets/img1.jpg'></img>))}
+                  {/* {ImageDisplay(true, <ItemDisplay content={content}/>)} */}
 
         </div>
     </div>
@@ -550,6 +614,7 @@ function App() {
   const [navUser, setNavUser] = useState('Account');
   useEffect(() => {
     checkForLogin();
+    // readItem()
   },[])
 
   const logOut = async () => {
@@ -572,7 +637,7 @@ function App() {
 
     window.location.href = "/";
   }
-  
+
 
 
   const checkForLogin = async () => {
@@ -653,10 +718,28 @@ function App() {
           <MainDisplay />
           <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
             {/* <PopupDisplay /> */}
-            {PopupDisplay(CreateItem(), "create",270,140)}
-            {PopupDisplay(AccountDisplay(),"account", 270,140)}
-            {PopupDisplay(CreateAccount(),"create_account", 270,140)}
-            {PopupDisplay(ItemDisplay(<img src='/src/assets/img1.jpg'></img>), "info",250,100)}
+            {/* {PopupDisplay(CreateItem(), "create",270,140)} */}
+            {/* {PopupDisplay(AccountDisplay(),"account", 270,140)} */}
+            {/* {PopupDisplay(CreateAccount(),"create_account", 270,140)} */}
+            <PopupDisplay
+              display={<CreateItem/>}
+              commandID={"create"}
+              w={270}
+              h={140}
+            />
+            <PopupDisplay
+              display={<AccountDisplay/>}
+              commandID={"account"}
+              w={270}
+              h={140}
+            />
+            <PopupDisplay
+              display={<CreateAccount/>}
+              commandID={"create_account"}
+              w={270}
+              h={140}
+            />
+            {/* {PopupDisplay(ItemDisplay(<img src='/src/assets/img1.jpg'></img>), "info",250,100)} */}
           </div>
 
         </div>

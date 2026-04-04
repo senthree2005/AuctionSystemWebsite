@@ -41,6 +41,23 @@ con.connect(function(err) {
     });
 });
 
+app.get('/display_item', async (req, res)=> {
+    const q = 'SELECT * FROM item'
+    con.execute(q, (err,result) => {
+        console.log("Result:", result)
+        res.json(result)
+    })
+})
+
+app.get('/specific_item', async (req, res) => {
+    const product_id = req.body
+    const q = 'SELECT * FROM item WHERE product_id = ?'
+    con.execute(q,[product_id] ,(err, result) => {
+        console.log("Product_ID: ", product_id)
+        res.json(result)
+    })
+})
+
 app.post('/create_item', authenticateToken, async (req, res) => {
   const { product_name, product_description, deadline_date, starting_bid, minimum_bid, phone_number } = req.body;
 
@@ -89,7 +106,7 @@ app.post('/api/auth/login', async (req, res) => {
         if (!isMatch) {
             return res.status(401).send("Invalid credentials");
         }
-        const accessToken = generateAccessToken(user.username );
+        const accessToken = generateAccessToken(user.username);
         const refreshToken = jwt.sign(user.username, process.env.REFRESH_TOKEN_SECRET);        refreshTokens.push(refreshToken)
         res.status(200).json({
             message: "Login successful",
