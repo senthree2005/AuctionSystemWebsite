@@ -164,7 +164,11 @@ function MiniItemDisplay() {
   }
 
   useEffect(() => {
-  readItem()
+    const intervalId = setInterval(()=> {
+      readItem()
+    },1000)
+    return ()=>clearInterval(intervalId)
+    
 }, [])
   
   return(
@@ -606,19 +610,20 @@ function PromoDisplay() {
     const response = await axios.get(hostURL + "/display_item")
     setItems(response.data)
 
-
   }  catch (error) {
       console.error("Error fetching items:", error)
     }
   }
-
+  // useEffect(()=> {
+  //   readItem()
+  // },[])
   useEffect(() => {
-  readItem()
+    const intervalId = setInterval(()=> {
+      readItem()
+    },1000)
+    return ()=>clearInterval(intervalId)
 }, [])
 
-  const itemsDisplay = () => {
-    
-  }
   return (
     <div class= "flex justify-between min-w-250 max-w-250 min-h-110 max-h-110 backdrop-blur-xs bg-slate-900/80 border-2 border-gray-300 rounded-xl shadow-md p-6 mt-10 mb-10 text-white">
         {/* {ItemDisplay()} */}

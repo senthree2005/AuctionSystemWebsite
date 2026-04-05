@@ -44,7 +44,6 @@ con.connect(function(err) {
 app.get('/display_item', async (req, res)=> {
     const q = 'SELECT * FROM item'
     con.execute(q, (err,result) => {
-        console.log("Result:", result)
         res.json(result)
     })
 })
