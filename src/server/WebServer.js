@@ -48,24 +48,12 @@ app.get('/display_item', async (req, res)=> {
     })
 })
 
-// app.post('/place_bid', authenticateToken, async(req, res)=> {
-//     const {product_id,bid,bidder} = req.body;
-//     // const q = 'INSERT INTO transactionbids (product_id, highest_bid, bidder) VALUES (?,?,?)'
-//     const q = 'START TRANSACTION; INSERT INTO item (starting'
-//     con.query(q, [product_id, bid, bidder], (err,result)=> {
-//         if (err) return res.status(500).send(err);
-//         con.query()
-//         res.status(201).send({ message: "Bid Inserted", result });
-//     })
-// })
 
 app.post('/place_bid', authenticateToken, (req, res) => {
   const { product_id, bid, bidder } = req.body;
 
   con.beginTransaction((err) => {
     if (err) return res.status(500).send(err);
-
-    // 1. Insert the bid
     const insertBid = `
       INSERT INTO transactionbids (product_id, highest_bid, bidder) VALUES (?, ?, ?)`;
 
@@ -73,16 +61,12 @@ app.post('/place_bid', authenticateToken, (req, res) => {
       if (err) {
         return con.rollback(() => res.status(500).send(err));
       }
+      const updateItem = `UPDATE item SET starting_bid = ?, highest_bidder = ? WHERE product_id = ?`;
 
-      // 2. Update the item starting_bid
-      const updateItem = `UPDATE item SET starting_bid = ? WHERE product_id = ?`;
-
-      con.query(updateItem, [bid, product_id], (err) => {
+      con.query(updateItem, [bid,bidder, product_id], (err) => {
         if (err) {
           return con.rollback(() => res.status(500).send(err));
         }
-
-        // 3. Commit transaction
         con.commit((err) => {
           if (err) {
             return con.rollback(() => res.status(500).send(err));
@@ -179,7 +163,7 @@ function authenticateToken(req, res, next) {
   jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
     if (err) return res.status(403).json({ error: "Invalid or expired token." });
 
-    req.user = user; // ✅ now user.username is a string
+    req.user = user;
     next();
   });
 }

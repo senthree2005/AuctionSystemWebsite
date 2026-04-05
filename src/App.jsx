@@ -25,17 +25,6 @@ function MiniDisplay({content}) {
 
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
-  // setProductID(content.product_id)
-  // const getItemData = async () => {
-  //   try {
-  //     const response = await axios.get(hostURL + "/specific_item", {
-  //       product_id
-  //     })
-
-  //   } catch(error) {
-
-  //   }
-  // }
 
   return (
           <div class="bg-indigo-950 w-100 h-40 border border-blue-400 rounded-xl grid grid-cols-2">
@@ -77,7 +66,7 @@ function MiniDisplay({content}) {
                 
                 {isModalOpen && specificContent && (
                 <PopupDisplay
-                  display={<ItemDisplay content={specificContent} />}
+                  display={<ItemDisplay content={specificContent} refresh={true}/>}
                   commandID="info"
                   w={250}
                   h={100}
@@ -122,16 +111,6 @@ function ImageDisplay({autoplayState, elementDisplay}) {
       <div className="embla__viewport" ref={emblaRef}>
         <div className="embla__container">
           {elementDisplay}
-          {/* <div className = "embla__slide">
-            {elementDisplay}
-          </div>
-
-          <div className = "embla__slide">
-            {elementDisplay}
-          </div>
-          <div className = "embla__slide">
-            {elementDisplay}
-          </div> */}
             
         </div>
       </div>
@@ -143,10 +122,7 @@ function ImageDisplay({autoplayState, elementDisplay}) {
   )
 }
 function MiniItemDisplay() {
-  //   const items = []
-  // for(let i=0;i<25;i++) {
-  //   items.push(<MiniDisplay/>)
-  // }
+
   const [items, setItems] = useState([])
   
   
@@ -190,18 +166,6 @@ function MiniItemDisplay() {
   ) 
 }
 
-//  const notify = () => toast.info(
-//         bidder + " Place a $" + bid_amount + " Bid! on your #" + product_id, {
-//         position: "bottom-left",
-//         autoClose: 5000,
-//         hideProgressBar: false,
-//         closeOnClick: false,
-//         pauseOnHover: true,
-//         draggable: true,
-//         className:"border border-gray-700",
-//         progress: undefined,
-//         theme: "dark",
-//   })
 function notification() {
   toast.info(
         "User12443 Place a $4350.00",  {
@@ -216,20 +180,8 @@ function notification() {
         theme: "dark",
   })
 }
-//  const notify = () => toast.info(
-//         "User12443 Place a $4350.00",  {
-//         position: "bottom-left",
-//         autoClose: 5000,
-//         hideProgressBar: false,
-//         closeOnClick: false,
-//         pauseOnHover: true,
-//         draggable: true,
-//         className:"border border-gray-700",
-//         progress: undefined,
-//         theme: "dark",
-//   })
 
-function ItemDisplay({content}) {
+function ItemDisplay({content,refresh}) {
   const [userBid, setUserBid] = useState('')
   const product_id = content.product_id
   const placeBid = async (e) => {
@@ -256,7 +208,7 @@ function ItemDisplay({content}) {
       });
 
     console.log("Bid:", response.data);
-    window.location.href='/'
+    if(refresh) window.location.href='/'
   } catch (error) {
     console.error("Error placing bid:", error.response?.data || error.message);
   }
@@ -279,7 +231,7 @@ function ItemDisplay({content}) {
             <p>Time Remaining: {content.deadline_date}</p>
             <br></br>
             <div class="text-left">
-              <h3>Current Highest Bid: </h3>
+              <h3>Current Highest Bid: ({(content.highest_bidder) || "None"}) </h3>
               <h2 class="text-lime-400">{formatter.format(content.starting_bid.toFixed(2))}</h2>
 
               <h3>Minimum Bid: </h3>
@@ -288,7 +240,7 @@ function ItemDisplay({content}) {
           </div>
           
           <div class="text-end">
-            <p>Auctioneer:</p>
+            <p>Consignor:</p>
             <h2 class="font-thin">{content.seller_username}</h2>
             <br></br>
 
@@ -412,7 +364,6 @@ const AccountDisplay = () => {
         });
         console.log(token)
         window.location.href = '/'
-        // const posts = await apiClient.get('/posts');
         
       } else {
         console.log("Login failed");
@@ -535,7 +486,6 @@ const CreateItem = () => {
         <div >
           <label id="product_description" ><h2>Product Description:</h2></label>
           <textarea rows="5" cols="50" type="submit" value={product_description} onChange={(e)=>setProductDescription(e.target.value)} placeholder='Product Description' class="border py-2 px-4 font-thin font-sans" label="product_description"></textarea>
-          {/* <input class ="min-w-100 max-w-100 border" label="name_customer"></input> */}
         </div>
       </div>
 
@@ -589,7 +539,6 @@ function PopupDisplay({display, commandID, w,h,onClose}) {
         </div>
         
         <div class="">
-        {/* {ItemDisplay(<img src='/src/assets/img1.jpg'></img>)} */}
         {display}
       </div>
 
@@ -614,9 +563,6 @@ function PromoDisplay() {
       console.error("Error fetching items:", error)
     }
   }
-  // useEffect(()=> {
-  //   readItem()
-  // },[])
   useEffect(() => {
     const intervalId = setInterval(()=> {
       readItem()
@@ -636,7 +582,7 @@ function PromoDisplay() {
               elementDisplay={
                 item.slice(0, 3).map((itm, index) => (
                   <div className="embla__slide" key={index}>
-                    <ItemDisplay content={itm} />
+                    <ItemDisplay content={itm} refresh={false}/>
                   </div>
                 ))
               }
@@ -696,7 +642,16 @@ function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [navUser, setNavUser] = useState('Account');
   useEffect(() => {
+    const intervalId = setInterval(()=> {
+      
+      // if(localStorage.getItem("accessToken")!==null) {
+      //   notification()
+      // }
+
+    },1000)
     checkForLogin();
+    return ()=>clearInterval(intervalId)
+    
     // readItem()
   },[])
 
