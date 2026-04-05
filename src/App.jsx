@@ -198,8 +198,8 @@ function MiniItemDisplay() {
 //         progress: undefined,
 //         theme: "dark",
 //   })
-
- const notify = () => toast.info(
+function notification() {
+  toast.info(
         "User12443 Place a $4350.00",  {
         position: "bottom-left",
         autoClose: 5000,
@@ -211,8 +211,52 @@ function MiniItemDisplay() {
         progress: undefined,
         theme: "dark",
   })
+}
+//  const notify = () => toast.info(
+//         "User12443 Place a $4350.00",  {
+//         position: "bottom-left",
+//         autoClose: 5000,
+//         hideProgressBar: false,
+//         closeOnClick: false,
+//         pauseOnHover: true,
+//         draggable: true,
+//         className:"border border-gray-700",
+//         progress: undefined,
+//         theme: "dark",
+//   })
 
 function ItemDisplay({content}) {
+  const [userBid, setUserBid] = useState('')
+  const product_id = content.product_id
+  const placeBid = async (e) => {
+  e.preventDefault();
+  try {
+    const token = localStorage.getItem('accessToken');
+    if (!token) throw new Error("No access token");
+
+    const username = await getUserName();
+    const bidValue = Number(userBid);
+
+    if (!content) return;
+    if (username === content.seller_username ||
+        bidValue < (content.starting_bid + content.minimum_bid)
+    ) return;
+
+    const response = await axios.post(hostURL + '/place_bid', {
+      product_id: content.product_id,
+      bid: bidValue,   
+      bidder: username   
+    },
+  {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+    console.log("Bid:", response.data);
+    window.location.href='/'
+  } catch (error) {
+    console.error("Error placing bid:", error.response?.data || error.message);
+  }
+};
 
   return (
     <div class = "flex p-5 ml-10 z-0">
@@ -262,9 +306,9 @@ function ItemDisplay({content}) {
         </div>
         
         <div class="mt-4">
-          <form>
+          <form onSubmit={placeBid}>
             <div>
-            <input type="text" required class=" border border-indigo-600 focus:border-lime-400 focus:outline-hidden py-2 px-4 rounded-lg min-w-100 max-w-100 "></input>
+            <input type="text" value={userBid} onChange={(e)=>setUserBid(e.target.value)} required class=" border border-indigo-600 focus:border-lime-400 focus:outline-hidden py-2 px-4 rounded-lg min-w-100 max-w-100 "></input>
           </div>
           <div>
             <input type="submit" value="Place Bid" class = " bg-blue-700 hover:bg-white hover:text-black text-white font-bold py-2 px-4 rounded-full min-w-100 max-w-100 mt-5"></input>
@@ -690,7 +734,7 @@ function App() {
 
               <div class="flex items-center justify-center">
                 <div class="text-white hover:text-yellow-400 text-4xl mt-2">
-                  <button onClick={notify} class="min-h-10 max-h-10 min-w-10 max-w-10">
+                  <button onClick={notification} class="min-h-10 max-h-10 min-w-10 max-w-10">
                       <AiFillBell />
 
                   </button>

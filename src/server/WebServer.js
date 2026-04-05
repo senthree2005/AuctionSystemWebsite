@@ -49,6 +49,55 @@ app.get('/display_item', async (req, res)=> {
     })
 })
 
+// app.post('/place_bid', authenticateToken, async(req, res)=> {
+//     const {product_id,bid,bidder} = req.body;
+//     // const q = 'INSERT INTO transactionbids (product_id, highest_bid, bidder) VALUES (?,?,?)'
+//     const q = 'START TRANSACTION; INSERT INTO item (starting'
+//     con.query(q, [product_id, bid, bidder], (err,result)=> {
+//         if (err) return res.status(500).send(err);
+//         con.query()
+//         res.status(201).send({ message: "Bid Inserted", result });
+//     })
+// })
+
+app.post('/place_bid', authenticateToken, (req, res) => {
+  const { product_id, bid, bidder } = req.body;
+
+  con.beginTransaction((err) => {
+    if (err) return res.status(500).send(err);
+
+    // 1. Insert the bid
+    const insertBid = `
+      INSERT INTO transactionbids (product_id, highest_bid, bidder) VALUES (?, ?, ?)`;
+
+    con.query(insertBid, [product_id, bid, bidder], (err, result) => {
+      if (err) {
+        return con.rollback(() => res.status(500).send(err));
+      }
+
+      // 2. Update the item starting_bid
+      const updateItem = `UPDATE item SET starting_bid = ? WHERE product_id = ?`;
+
+      con.query(updateItem, [bid, product_id], (err) => {
+        if (err) {
+          return con.rollback(() => res.status(500).send(err));
+        }
+
+        // 3. Commit transaction
+        con.commit((err) => {
+          if (err) {
+            return con.rollback(() => res.status(500).send(err));
+          }
+
+          res.status(201).send({
+            message: "Bid placed and item updated",
+            transaction_id: result.insertId
+          });
+        });
+      });
+    });
+  });
+});
 
 app.post('/create_item', authenticateToken, async (req, res) => {
   const { product_name, product_description, deadline_date, starting_bid, minimum_bid, phone_number } = req.body;
